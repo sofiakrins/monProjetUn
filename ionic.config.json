@@ -1,0 +1,7 @@
+{
+  "name": "monProjetUn",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
