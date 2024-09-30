@@ -14,9 +14,12 @@
             </ion-card-header>
   
             <ion-card-content>
+
               <ion-input v-model="email" type="email" placeholder="Email" clear-input></ion-input>
               <ion-input v-model="password" type="password" placeholder="Password" clear-input></ion-input>
+
               <ion-button expand="block" @click="login">Login</ion-button>
+
               <ion-button expand="block" color="secondary" href="/register">Sign up</ion-button>
             </ion-card-content>
           </ion-card>
@@ -33,25 +36,33 @@
   
   <script lang="ts">
   import { defineComponent, ref } from 'vue';
-  
+  import { useRouter } from 'vue-router';
+
   export default defineComponent({
     setup() {
       const email = ref('');
       const password = ref('');
+      const router = useRouter();
   
       
       const login = async () => {
-  try {
-    const response = await fetch('https://server-1-t93s.onrender.com/api/tp/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: email.value,
-        password: password.value,
-      }),
-    });
+
+        if (!email.value || !password.value) {
+        alert('Please fill in both email and password');
+        return;
+      }
+
+        try {
+         const response = await fetch('https://server-1-t93s.onrender.com/api/tp/login', {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email.value,
+            password: password.value,
+          }),
+        });
 
     if (response.ok) {
       const data = await response.json();
