@@ -2,8 +2,9 @@
   <ion-page>
     <ion-header>
       <ion-toolbar color="primary">
-        <ion-title>Geolocation</ion-title>
+        <ion-title>Géolocalisation</ion-title>
         <ion-buttons slot="end">
+          <!-- Bouton pour se déconnecter -->
           <ion-button @click="logout">Déconnecter</ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -21,6 +22,9 @@
           <ion-label>Latitude: </ion-label>
           <ion-label>{{ location ? location.latitude : 'Chargement...' }}</ion-label>
         </ion-item>
+
+        <!-- Bouton pour obtenir l'emplacement actuel -->
+        <ion-button expand="block" @click="getCurrentLocation">Obtenir la position actuelle</ion-button>
 
         <!-- Bouton pour ajouter l'emplacement actuel -->
         <ion-button expand="block" @click="addLocation" v-if="location">Ajouter Emplacement</ion-button>
@@ -47,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { Geolocation } from '@capacitor/geolocation';
 import { useRouter } from 'vue-router';
 
@@ -73,10 +77,10 @@ export default defineComponent({
       }
     };
 
-    // Appeler la fonction getCurrentLocation lorsque la page est chargée
-    const ionViewDidEnter = () => {
+    // Utiliser mounted() pour exécuter getCurrentLocation quand le composant est monté
+    onMounted(() => {
       getCurrentLocation();
-    };
+    });
 
     // Ajouter l'emplacement actuel à la liste des emplacements sauvegardés
     const addLocation = () => {
@@ -105,7 +109,6 @@ export default defineComponent({
       addLocation,
       clearLocations,
       logout,
-      ionViewDidEnter,
     };
   }
 });

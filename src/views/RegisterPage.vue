@@ -55,6 +55,12 @@ export default defineComponent({
     const password = ref('');
 
     const register = async () => {
+
+      if (!firstName.value || !lastName.value || !email.value || !password.value) {
+    alert("All fields are required.");
+    return;
+  }
+
       try {
         const response = await fetch('https://server-1-t93s.onrender.com/api/tp/signup', {
           method: 'POST',
@@ -62,10 +68,10 @@ export default defineComponent({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            firstName: firstName.value,
-            lastName: lastName.value,
-            email: email.value,
-            password: password.value,
+            firstName: 'John',
+           lastName: 'Doe',
+           email: 'johndoe@example.com',
+           password: 'password123',
           }),
         });
 

@@ -36,9 +36,17 @@
   
   <script lang="ts">
   import { defineComponent, ref } from 'vue';
+  import { IonCard, IonCardHeader, IonCardContent, IonInput, IonButton } from '@ionic/vue';
   import { useRouter } from 'vue-router';
 
   export default defineComponent({
+    components: {
+    IonCard,
+    IonCardHeader,
+    IonCardContent,
+    IonInput,
+    IonButton,
+  },
     setup() {
       const email = ref('');
       const password = ref('');
@@ -67,7 +75,7 @@
     if (response.ok) {
       const data = await response.json();
       console.log('Login successful', data);
-      // Redirect to geolocation page
+      // Redirige à la page de géolocalisation 
       router.push('/geolocation');
     } else {
       console.error('Login failed');
@@ -92,5 +100,6 @@
   .ion-padding {
     padding: 16px;
   }
+
   </style>
   
