@@ -10,35 +10,51 @@
     </ion-header>
 
     <ion-content>
-      <div class="ion-padding">
-        <ion-card>
+      <div class="register-wrapper ion-padding">
+        <ion-card class="register-card">
           <ion-card-header>
-            <ion-title>Register</ion-title>
+            <ion-title>Inscription</ion-title>
           </ion-card-header>
 
           <ion-card-content>
-              <!-- First Name Input -->
-              <ion-input v-model="firstName" placeholder="First Name" clear-input></ion-input>
-  
-              <!-- Last Name Input -->
-              <ion-input v-model="lastName" placeholder="Last Name" clear-input></ion-input>
-  
-              <!-- Email Input -->
-              <ion-input v-model="email" type="email" placeholder="Email" clear-input></ion-input>
-  
-              <!-- Password Input -->
-              <ion-input v-model="password" type="password" placeholder="Password" clear-input></ion-input>
-  
-              <!-- Sign Up Button -->
-              <ion-button expand="block" @click="register">Sign up</ion-button>
-            </ion-card-content>
-          </ion-card>
-        </div>
-      </ion-content>
+            <!-- Champs de saisie avec labels flottants pour prénom, nom, email et mot de passe -->
+            <ion-item class="input-item">
+              <ion-label position="floating">Prénom</ion-label>
+              <ion-input v-model="firstName" clear-input></ion-input>
+            </ion-item>
+            <ion-item class="input-item">
+              <ion-label position="floating">Nom</ion-label>
+              <ion-input v-model="lastName" clear-input></ion-input>
+            </ion-item>
+            <ion-item class="input-item">
+              <ion-label position="floating">Email</ion-label>
+              <ion-input v-model="email" type="email" clear-input></ion-input>
+            </ion-item>
+            <ion-item class="input-item">
+              <ion-label position="floating">Mot de passe</ion-label>
+              <ion-input v-model="password" type="password" clear-input></ion-input>
+            </ion-item>
+
+            <!-- Bouton d'inscription -->
+            <ion-button class="register-button" expand="block" @click="register">
+              S'inscrire
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Spinner de chargement pendant la requête d'inscription -->
+        <ion-spinner v-if="loading"></ion-spinner>
+
+        <!-- Message d'erreur en cas d'échec de l'inscription -->
+        <div v-if="registerError" class="error-message">Échec de l'inscription, veuillez réessayer.</div>
+      </div>
+    </ion-content>
 
     <ion-footer>
-      <ion-toolbar>
-        <ion-title>Footer</ion-title>
+      <ion-toolbar color="secondary">
+        <ion-title style="text-align: center; font-size: 14px;">
+          © Sofia Krins et Ty Mammoliti 2024
+        </ion-title>
       </ion-toolbar>
     </ion-footer>
   </ion-page>
@@ -46,6 +62,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   setup() {
@@ -53,13 +70,13 @@ export default defineComponent({
     const lastName = ref('');
     const email = ref('');
     const password = ref('');
+    const registerError = ref(false);
+    const loading = ref(false);
+    const router = useRouter();
 
     const register = async () => {
-
-      if (!firstName.value || !lastName.value || !email.value || !password.value) {
-    alert("All fields are required.");
-    return;
-  }
+      registerError.value = false;
+      loading.value = true;
 
       try {
         const response = await fetch('https://server-1-t93s.onrender.com/api/tp/signup', {
@@ -68,23 +85,26 @@ export default defineComponent({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            firstName: 'John',
-           lastName: 'Doe',
-           email: 'johndoe@example.com',
-           password: 'password123',
+            firstName: firstName.value,
+            lastName: lastName.value,
+            email: email.value,
+            password: password.value,
           }),
         });
 
         if (response.ok) {
           const data = await response.json();
-          console.log('User registered successfully', data);
-          // Rediriger à la page de connexion
+          console.log('Utilisateur inscrit avec succès', data);
+          // Rediriger vers la page de connexion
+          router.push('/login');
         } else {
-          console.error('Registration failed');
-          alert('Registration failed, please try again.');
+          registerError.value = true;
         }
       } catch (error) {
-        console.error('Error occurred during registration:', error);
+        console.error('Une erreur est survenue pendant l\'inscription :', error);
+        registerError.value = true;
+      } finally {
+        loading.value = false;
       }
     };
 
@@ -93,6 +113,8 @@ export default defineComponent({
       lastName,
       email,
       password,
+      registerError,
+      loading,
       register,
     };
   },
@@ -100,8 +122,49 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.ion-padding {
-  padding: 16px;
+/* Ensure spacing and larger elements for better UI */
+.register-wrapper {
+  max-width: 500px;
+  margin: 0 auto;
+  padding-top: 50px;
 }
 
+.register-card {
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+}
+
+.input-item {
+  margin-bottom: 20px;
+}
+
+.register-button {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  height: 50px;
+}
+
+/* Error message style */
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 768px) {
+  .register-wrapper {
+    padding: 20px;
+  }
+
+  .register-card {
+    font-size: 1rem;
+  }
+
+  .register-button {
+    font-size: 1rem;
+    height: 45px;
+  }
+}
 </style>

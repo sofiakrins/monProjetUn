@@ -5,3 +5,19 @@ http://ionicframework.com/docs/theming/ */
     --ion-color-secondary: #ff69b4;
   }
   
+  /* Applique l'image de fond à tout le contenu (3 pages)*/
+  html, body, ion-app, ion-content {
+    background: url('./pink-city.jpg') no-repeat center center fixed !important;
+    background-size: cover !important; /* Assure que l'image couvre tout l'arrière-plan */
+    min-height: 100vh !important;; /* Assure que l'image prend toute la hauteur de l'écran */
+  }
+  
+  ion-content {
+    /* Appliquer de la transparence sur la zone où se trouvent les formulaires */
+    background-color: rgba(255, 255, 255, 0.8); /* Légère transparence blanche */
+    padding: 20px; /* Assure qu'il y a de l'espace autour du contenu du formulaire */
+    border-radius: 10px; /* Optionnel : coins arrondis */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre subtile pour effet 3D*/
+  }
+  
+  

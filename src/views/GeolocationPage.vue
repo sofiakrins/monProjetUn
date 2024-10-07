@@ -12,22 +12,33 @@
 
     <ion-content>
       <div class="ion-padding">
-        <!-- Affiche les coordonnées de longitude -->
-        <ion-item>
-          <ion-label>Longitude: </ion-label>
-          <ion-label>{{ location ? location.longitude : 'Chargement...' }}</ion-label>
-        </ion-item>
-        <!-- Affiche les coordonnées de latitude -->
-        <ion-item>
-          <ion-label>Latitude: </ion-label>
-          <ion-label>{{ location ? location.latitude : 'Chargement...' }}</ion-label>
-        </ion-item>
-
         <!-- Bouton pour obtenir l'emplacement actuel -->
         <ion-button expand="block" @click="getCurrentLocation">Obtenir la position actuelle</ion-button>
 
-        <!-- Bouton pour ajouter l'emplacement actuel -->
-        <ion-button expand="block" @click="addLocation" v-if="location">Ajouter Emplacement</ion-button>
+        <!-- Affichage du spinner pendant la récupération de l'emplacement actuel -->
+        <ion-spinner v-if="loading"></ion-spinner>
+
+        <!-- Affichage de la position lorsque récupérée -->
+        <div v-if="location && !loading">
+          <ion-card class="geolocation-card">
+            <ion-card-header>
+              <ion-title>Votre Position Actuelle</ion-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-item>
+                <ion-label>Latitude: </ion-label>
+                <ion-label>{{ location.latitude }}</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-label>Longitude: </ion-label>
+                <ion-label>{{ location.longitude }}</ion-label>
+              </ion-item>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Bouton pour ajouter l'emplacement actuel -->
+          <ion-button expand="block" @click="addLocation">Ajouter Emplacement</ion-button>
+        </div>
 
         <h2>Emplacements Enregistrés:</h2>
         <!-- Liste des emplacements sauvegardés -->
@@ -38,32 +49,36 @@
         </ion-list>
 
         <!-- Bouton pour effacer tous les emplacements -->
-        <ion-button expand="block" color="danger" @click="clearLocations">Effacer Tout</ion-button>
+        <ion-button expand="block" color="danger" @click="clearLocations">
+          Effacer Tout
+        </ion-button>
       </div>
     </ion-content>
 
     <ion-footer>
-      <ion-toolbar>
-        <ion-title>Pied de page</ion-title>
+      <ion-toolbar color="secondary">
+        <ion-title style="text-align: center; font-size: 14px;">
+          © Sofia Krins et Ty Mammoliti 2024
+        </ion-title>
       </ion-toolbar>
     </ion-footer>
   </ion-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { Geolocation } from '@capacitor/geolocation';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
   setup() {
-    // Variables pour stocker l'emplacement actuel et les emplacements enregistrés
     const location = ref<{ latitude: number, longitude: number } | null>(null);
     const savedLocations = ref<Array<{ latitude: number, longitude: number }>>([]);
+    const loading = ref(false); // Ajout de l'état de chargement
     const router = useRouter();
 
-    // Fonction pour obtenir l'emplacement actuel de l'utilisateur
     const getCurrentLocation = async () => {
+      loading.value = true; // Commence le chargement
       try {
         const coordinates = await Geolocation.getCurrentPosition();
         location.value = {
@@ -71,18 +86,13 @@ export default defineComponent({
           longitude: coordinates.coords.longitude,
         };
       } catch (error) {
-        // Gérer l'erreur en affichant un message dans la console et une alerte à l'utilisateur
-        console.error("Erreur lors de la récupération de la position: ", error);
-        alert("Impossible de récupérer la position. Vérifiez votre GPS ou vos permissions.");
+        console.error('Erreur lors de la récupération de la position :', error);
+        alert('Impossible de récupérer la position. Vérifiez votre GPS ou vos permissions.');
+      } finally {
+        loading.value = false; // Arrête le chargement
       }
     };
 
-    // Utiliser mounted() pour exécuter getCurrentLocation quand le composant est monté
-    onMounted(() => {
-      getCurrentLocation();
-    });
-
-    // Ajouter l'emplacement actuel à la liste des emplacements sauvegardés
     const addLocation = () => {
       if (location.value) {
         savedLocations.value.push({
@@ -92,12 +102,10 @@ export default defineComponent({
       }
     };
 
-    // Effacer tous les emplacements enregistrés
     const clearLocations = () => {
       savedLocations.value = [];
     };
 
-    // Fonction de déconnexion et redirection vers la page de connexion
     const logout = () => {
       router.push('/login');
     };
@@ -109,12 +117,19 @@ export default defineComponent({
       addLocation,
       clearLocations,
       logout,
+      loading, // Ajout du retour de l'état de chargement
     };
   }
 });
 </script>
 
 <style scoped>
+/* Carte de géolocalisation */
+.geolocation-card {
+  margin-top: 20px;
+}
+
+/* Padding de base */
 .ion-padding {
   padding: 16px;
 }
